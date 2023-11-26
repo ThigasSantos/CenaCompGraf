@@ -23,49 +23,36 @@ void init(void)
 	glLoadIdentity();
 }
 
-void Background(){
-	glBegin(GL_QUADS);
-		glColor3ub(rSky,gSky,bSky);			//Plano de fundo
-		glVertex2f(-10.0,10.0);
-		glVertex2f(-10.0,-10.0);
-		glVertex2f(10.0,-10.0);
-		glVertex2f(10.0,10.0);
-	glEnd();	
+void Quads(float x, float y, float width, float height) {
+    glBegin(GL_QUADS);
+    glVertex2f(x, y); // Canto inferior esquerdo
+    glVertex2f(x + width, y); // Canto inferior direito
+    glVertex2f(x + width, y + height); // Canto superior direito
+    glVertex2f(x, y + height); // Canto superior esquerdo
+    glEnd();
 }
 
-void Sun(float centerX, float centerY) {
-    glColor3ub(rSun, gSun, bSun); 
+void Circle(float x, float y, float radius, int segments) {
     glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(centerX, centerY); // Centro do círculo
-
-    int segments = 100;
+    glVertex2f(x, y); // Centro do círculo
     for (int i = 0; i <= segments; ++i) {
         float theta = 2.0f * M_PI * static_cast<float>(i) / static_cast<float>(segments);
-        float radius = 1.0f;
-        float x = centerX + radius * std::cos(theta);
-        float y = centerY + radius * std::sin(theta);
-        glVertex2f(x, y);
+        float dx = radius * std::cos(theta);
+        float dy = radius * std::sin(theta);
+        glVertex2f(x + dx, y + dy);
     }
-
     glEnd();
+}
+
+void Background(){		    
+    glColor3ub(rSky,gSky,bSky);			//Plano de fundo
+    Quads(-10.0f, -10.0f, 20.0f, 20.0f);	//Desenha o plano de fundo
 }
 
 void Cloud(float x, float y, float radius, int numCircles, float incX, float incY) {
     glColor3f(1.0f, 1.0f, 1.0f); // Branco
     for (int i = 0; i < numCircles; ++i) {
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(x, y); // Centro do círculo
-
-        int segments = 100;
-        for (int j = 0; j <= segments; ++j) {
-            float theta = 2.0f * M_PI * static_cast<float>(j) / static_cast<float>(segments);
-            float x_i = x + radius * std::cos(theta);
-            float y_i = y + radius * std::sin(theta);
-            glVertex2f(x_i, y_i);
-        }
-
-        glEnd();
-
+        Circle(x, y, radius, 100);
         // Ajusta as coordenadas para o próximo círculo
         x += incX;
         y -= incY;
@@ -73,24 +60,14 @@ void Cloud(float x, float y, float radius, int numCircles, float incX, float inc
 }
 
 void GrassBg(){
-	glBegin(GL_QUADS);
-		glColor3ub(0,100,0);			//Plano de fundo
-		glVertex2f(-10.0,2.0);
-		glVertex2f(-10.0,-10.0);
-		glVertex2f(10.0,-10.0);
-		glVertex2f(10.0,2.0);
-	glEnd();	
+    glColor3ub(0,100,0);
+	Quads(-10.0f, -4.0f, 20.0f, 6.0f);
 }
 
 void Road() {
     // Desenha a faixa de rodagem (um retângulo cinza)
     glColor3f(0.5f, 0.5f, 0.5f); // Cinza
-    glBegin(GL_QUADS);
-    glVertex2f(-10.0f, -4.0f); // Canto inferior esquerdo
-    glVertex2f(10.0f, -4.0f);  // Canto inferior direito
-    glVertex2f(10.0f, -10.0f);   // Canto superior direito
-    glVertex2f(-10.0f, -10.0f);  // Canto superior esquerdo
-    glEnd();
+    Quads(-10.0f, -10.0f, 20.0f, 6.0f);
 
     // Desenha as marcações da estrada (linhas brancas)
     glColor3f(1.0f, 1.0f, 1.0f); // Branco
@@ -131,12 +108,7 @@ void Star(float x, float y, float radius) {
 void House() {
     // Desenha o corpo da casa 
     glColor3f(0.7f, 0.7f, 0.7f); // Cinza
-    glBegin(GL_QUADS);
-    glVertex2f(4.0f, 1.5f); 
-    glVertex2f(4.0f, -1.0f);  
-    glVertex2f(6.0f, -1.0f);   
-    glVertex2f(6.0f, 1.5f);  
-    glEnd();
+    Quads(4.0f, -1.0f, 2.0f, 2.5f);
 
     // Desenha o telhado 
     glColor3f(0.8f, 0.2f, 0.2f); // Vermelho
@@ -148,21 +120,11 @@ void House() {
 
     // Desenha a porta 
     glColor3f(0.4f, 0.2f, 0.0f); // Marrom
-    glBegin(GL_QUADS);
-    glVertex2f(4.5f, -1.0f); 
-    glVertex2f(5.0f, -1.0f);  
-    glVertex2f(5.0f, 0.2f);   
-    glVertex2f(4.5f, 0.2f);  
-    glEnd();
+    Quads(4.5f, -1.0f, 0.5f, 1.2f);
 
     // Desenha a janela
     glColor3ub(rWindow, gWindow, bWindow); 
-    glBegin(GL_QUADS);
-    glVertex2f(5.2f, 0.0f);  
-    glVertex2f(5.2f, 0.6f);  
-    glVertex2f(5.8f, 0.6f);   
-    glVertex2f(5.8f, 0.0f);   
-    glEnd();
+    Quads(5.2f, 0.0f, 0.6f, 0.6f);
 
 	//Desenha contorno da janela
 	glColor3f(0.0f, 0.0f, 0.0f); // Preto
@@ -197,13 +159,8 @@ void House() {
 void Tree(float x, float y, float trunkHeight, float trunkWidth, float foliageHeight, float foliageWidth) {
     // Desenha o tronco
     glColor3f(0.4f, 0.2f, 0.0f); // Marrom escuro
-    glBegin(GL_QUADS);
-    glVertex2f(x - trunkWidth / 2, y);               // Canto inferior esquerdo
-    glVertex2f(x + trunkWidth / 2, y);               // Canto inferior direito
-    glVertex2f(x + trunkWidth / 2, y + trunkHeight); // Canto superior direito
-    glVertex2f(x - trunkWidth / 2, y + trunkHeight); // Canto superior esquerdo
-    glEnd();
-
+    Quads(x - trunkWidth / 2, y, trunkWidth, trunkHeight);
+    
     // Desenha a copa da árvore
     glColor3f(0.0f, 0.5f, 0.0f); // Verde escuro
     glBegin(GL_TRIANGLES);
@@ -218,25 +175,8 @@ void Lake(float x, float y, float widthTop, float widthBottom, float height, int
     glColor3f(0.0f, 0.5f, 1.0f); // Azul claro
 
     // Desenha bordas arredondadas
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < numSegments; ++i) {
-        float theta = 2.0f * M_PI * i / numSegments;
-        float radius = (widthTop + widthBottom) / 4.0f;
-        float px = x + radius * cos(theta);
-        float py = y + height / 2 + radius * sin(theta);
-        glVertex2f(px, py);
-    }
-    glEnd();
-
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < numSegments; ++i) {
-        float theta = 2.0f * M_PI * i / numSegments;
-        float radius = (widthTop + widthBottom) / 4.0f;
-        float px = x + radius * cos(theta);
-        float py = y - height / 2 - radius * sin(theta);
-        glVertex2f(px, py);
-    }
-    glEnd();
+    Circle(x, y, widthTop / 2.0f, numSegments);
+    Circle(x, y - height, widthBottom / 2.0f, numSegments);
 }
 
 void Bush(float x, float y, float radius, int numLeaves) {
@@ -247,58 +187,82 @@ void Bush(float x, float y, float radius, int numLeaves) {
         float leafX = x + radius * cos(angle);
         float leafY = y + radius * sin(angle);
 
-        glBegin(GL_POLYGON);
-        for (int j = 0; j < 360; j += 15) {
-            float leafAngle = j * M_PI / 180.0f;
-            float leafRadius = 0.3f * radius; // Ajuste o fator para controlar o tamanho das folhas
-            glVertex2f(leafX + leafRadius * cos(leafAngle), leafY + leafRadius * sin(leafAngle));
-        }
-        glEnd();
+        Circle(leafX, leafY, radius, 100);
     }
+}
+
+void Sun(float centerX, float centerY) {
+    glColor3ub(rSun, gSun, bSun); 
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(centerX, centerY); // Centro do círculo
+
+    Circle(centerX, centerY, 1.0f, 100);
+
+    glEnd();
 }
 
 void TrafficLight(float x, float y) {
     // Poste do semáforo
-    glColor3f(0.5f, 0.5f, 0.5f); // Cinza
-    glBegin(GL_QUADS);
-    glVertex2f(x - 0.1f, y);          // Canto inferior esquerdo
-    glVertex2f(x + 0.1f, y);          // Canto inferior direito
-    glVertex2f(x + 0.1f, y + 2.0f);    // Canto superior direito
-    glVertex2f(x - 0.1f, y + 2.0f);    // Canto superior esquerdo
-    glEnd();
+    glColor3f(0.0f, 0.0f, 0.0f); // Preto
+    Quads(x, y, 0.5f, 3.0f);
 
     // Luz vermelha
     glColor3f(1.0f, 0.0f, 0.0f); // Vermelho
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < 360; i++) {
-        float angle = i * M_PI / 180.0f;
-        float px = x + 0.0f + 0.05f * cos(angle);
-        float py = y + 1.8f + 0.05f * sin(angle);
-        glVertex2f(px, py);
-    }
-    glEnd();
+    Circle(x + 0.25f, y + 2.7f, 0.15f, 100);
 
     // Luz amarela
     glColor3f(1.0f, 1.0f, 0.0f); // Amarelo
-    glBegin(GL_POLYGON);
-    for (int i = 0; i < 360; i++) {
-        float angle = i * M_PI / 180.0f;
-        float px = x + 0.0f + 0.05f * cos(angle);
-        float py = y + 1.3f + 0.05f * sin(angle);
-        glVertex2f(px, py);
-    }
-    glEnd();
+    Circle(x+ 0.25f, y + 2.3f, 0.15f, 100);
 
     // Luz verde
     glColor3f(0.0f, 1.0f, 0.0f); // Verde
+    Circle(x + 0.25f, y + 1.9f, 0.15f, 100);
+}
+
+void Car(float x, float y){
+    // Desenha o corpo do carro
+    glColor3f(0.0f, 0.0f, 1.0f); // Azul
     glBegin(GL_POLYGON);
-    for (int i = 0; i < 360; i++) {
-        float angle = i * M_PI / 180.0f;
-        float px = x + 0.0f + 0.05f * cos(angle);
-        float py = y + 0.8f + 0.05f * sin(angle);
-        glVertex2f(px, py);
-    }
+    glVertex2f(x, y);          // Canto inferior esquerdo
+    glVertex2f(x + 2.0f, y);          // Canto inferior direito
+    glVertex2f(x + 2.0f, y + 1.0f);    // Canto medio direito
+    glVertex2f(x + 1.5f, y + 1.0f);    // Canto superior medio direito
+    glVertex2f(x + 1.5f, y + 1.5f);     // Canto superior direito 
+    glVertex2f(x + 0.5f, y + 1.5f);     // Canto superior esquerdo
+    glVertex2f(x, y + 1.0f);    // Canto medio esquerdo
     glEnd();
+
+    //Contorno do carro
+    glColor3f(0.0f, 0.0f, 0.0f); // Preto
+    glLineWidth(3.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(x, y);          // Canto inferior esquerdo
+    glVertex2f(x + 2.0f, y);          // Canto inferior direito
+    glVertex2f(x + 2.0f, y + 1.0f);    // Canto medio direito
+    glVertex2f(x + 1.5f, y + 1.0f);    // Canto superior medio direito
+    glVertex2f(x + 1.5f, y + 1.5f);     // Canto superior direito
+    glVertex2f(x + 0.5f, y + 1.5f);     // Canto superior esquerdo
+    glVertex2f(x, y + 1.0f);    // Canto medio esquerdo
+    glEnd();
+
+    // Desenha as rodas
+    glColor3f(0.0f, 0.0f, 0.0f); // Preto
+    Circle(x + 0.5f, y, 0.25f, 100);        // Roda esquerda
+    Circle(x + 1.5f, y, 0.25f, 100);        // Roda direita
+
+    //Aro da roda
+    glColor3f(1.0f, 1.0f, 1.0f); // Branco
+    Circle(x + 0.5f, y, 0.1f, 100);        // Roda esquerda
+    Circle(x + 1.5f, y, 0.1f, 100);        // Roda direita
+
+    // Desenha o vidro
+    glColor3f(0.0f, 1.0f, 1.0f); // Azul claro
+    Quads(x + 1.0f, y + 1.0f, 0.5f, 0.45f);
+
+    // Desenha o farol
+    glColor3f(rWindow, gWindow, bWindow);
+    Circle(x + 1.9f, y + 0.8f, 0.1f, 100);
+    
 }
 
 void ToggleSun(){
@@ -336,8 +300,7 @@ void ToggleWindow(){
 	}
 }
 
-void ToggleNight(){
-	
+void ToggleNight(){	
 	ToggleSun();
 	ToggleCloudsStar();
 	ToggleSky();
@@ -347,6 +310,7 @@ void ToggleNight(){
 void Draw(){
 	Background();
 	Sun(7.0f, 7.0f);
+
 	if(DrawClouds)
 	{
 		Cloud(-2.0f, 7.0f, 0.5f, 4, 0.6f, 0.2f); 
@@ -371,7 +335,8 @@ void Draw(){
 		Star(5.0f, 9.0f, 0.2f);
 		Star(6.0f, 6.0f, 0.1f);
 	}
-	GrassBg();
+	
+    GrassBg();
 	Road();
 	House();
 
@@ -389,11 +354,11 @@ void Draw(){
     Lake(-6.0f, 0.0f, 2.0f, 3.0f, 0.7f, 50);
     glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(8.0f, -4.0f, 0.0f);
-    glScalef(1.0f, 1.0f, 1.0f);
-    TrafficLight(0.0f, 0.0f);
-    glPopMatrix();
+    TrafficLight(8.0f, -4.0f);
+    Car(-9.0f, -5.7f);
+    Car(-5.0f, -8.7f);
+    Car(0.0f, -8.7f);
+    Car(2.0f, -5.7f);
 }
 
 void display( void )
@@ -442,7 +407,7 @@ int  main ( int argc, char** argv )
     glutInit ( &argc, argv );	//Usada apra iniciar o ambiente Glut
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
     glutCreateWindow ("Projeto Final"); 
-    glutInitWindowSize (500, 500);
+    glutInitWindowSize (1024, 1024);
     glutInitWindowPosition (0, 0);
     init();
     glutDisplayFunc (display);
