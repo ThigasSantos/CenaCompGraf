@@ -402,6 +402,37 @@ void Draw(){
 
 }
 
+void MenuTrafficLigth(int value){
+	
+}
+
+void Menu2(int value){
+	switch ( value )
+	{
+		case 0:
+			ToggleNight();
+			break;
+		case 1:
+			exit(0);
+			break;
+		case 2:
+			StopRunning();
+			break;
+	}
+}
+
+void Menu(){
+	int menu;
+	    
+    menu = glutCreateMenu(Menu2);
+    glutAddMenuEntry("Dia/Noite",0);
+    glutAddMenuEntry("Alternar Semaforo",2);
+    glutAddMenuEntry("Sair",1);
+    
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+
 void display( void ){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_LINE_STIPPLE);
@@ -438,7 +469,7 @@ void mouse(int button, int state, int x, int y){
 	}
 	else		
 	if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
-	{
+	{	Menu();
 	}
 	else
 	return;
