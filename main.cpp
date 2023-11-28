@@ -4,15 +4,17 @@
 #include <math.h>
 #include <cmath>
 
-GLfloat rSun= 255 ,gSun=255 ,bSun= 0 		//Cor do sol
+GLfloat x = 0.0
+,rTLR = 211 ,gTLR = 211,bTLR = 211
+,rTLG = 0 ,gTLG = 255 ,bTLG = 0   //Cores do sinal
+,rSun= 255 ,gSun=255 ,bSun= 0 		//Cor do sol
 ,rSky= 173, gSky= 216, bSky= 230			//Cor do ceu
 ,rWindow= 255, gWindow= 255, bWindow= 255;		//Cor da janela
-GLfloat lightColor[] = {1.0f, 1.0f, 1.0f, 1.0f}; // Branco
 bool DrawClouds = true; // Desenha as nuvens
 bool DrawStars = false; // Desenha as estrelas
+bool noRed = true;  //Sinal Vermelho
 
-void init(void)
-{
+void init(void){
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glOrtho(-10, 10,-10 , 10,-10,10);
     
@@ -135,7 +137,18 @@ void House() {
 	glVertex2f(5.8f, 0.6f);
 	glVertex2f(5.8f, 0.0f);
 	glEnd();
-
+	
+	//Iluminação noturna
+	if(DrawStars){
+		glColor4f(1.0,1.0,0,0.3);
+		glBegin(GL_POLYGON);
+		glVertex2f(5.2,0.6f);
+		glVertex2f(5.8f, 0.6f);
+		glVertex2f(6.2,-1.2);
+		glVertex2f(4.8,-1.2);
+		glEnd();
+	}
+	
 	//Desenha meio da janela
 	glLineWidth(1.0f);
 	glBegin(GL_LINES);
@@ -191,7 +204,7 @@ void Bush(float x, float y, float radius, int numLeaves) {
     }
 }
 
-void Sun(float centerX, float centerY) {
+void Sun(float centerX, float centerY){
     glColor3ub(rSun, gSun, bSun); 
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(centerX, centerY); // Centro do cÃ­rculo
@@ -201,22 +214,18 @@ void Sun(float centerX, float centerY) {
     glEnd();
 }
 
-void TrafficLight(float x, float y) {
+void TrafficLight(float x, float y){
     // Poste do semÃ¡foro
     glColor3f(0.0f, 0.0f, 0.0f); // Preto
     Quads(x, y, 0.5f, 3.0f);
 
     // Luz vermelha
-    glColor3f(1.0f, 0.0f, 0.0f); // Vermelho
+    glColor3ub(rTLR,gTLR,bTLR);
     Circle(x + 0.25f, y + 2.7f, 0.15f, 100);
 
-    // Luz amarela
-    glColor3f(1.0f, 1.0f, 0.0f); // Amarelo
-    Circle(x+ 0.25f, y + 2.3f, 0.15f, 100);
-
     // Luz verde
-    glColor3f(0.0f, 1.0f, 0.0f); // Verde
-    Circle(x + 0.25f, y + 1.9f, 0.15f, 100);
+    glColor3f(rTLG,gTLG,bTLG);
+    Circle(x+ 0.25f, y + 2.3f, 0.15f, 100);
 }
 
 void Car(float x, float y){
@@ -263,6 +272,16 @@ void Car(float x, float y){
     glColor3f(rWindow, gWindow, bWindow);
     Circle(x + 1.9f, y + 0.8f, 0.1f, 100);
     
+    //Iluminação Noturna
+    if(DrawStars){
+    	glColor4f(1.0,1.0,0.0,0.2);
+    	glBegin(GL_TRIANGLES);
+    	glVertex2f(x+1.9,y+0.8);
+    	glVertex2f(x+2.8,y+1.4);
+    	glVertex2f(x+2.8,y-0.4);
+		glEnd();
+	}
+    
 }
 
 void ToggleSun(){
@@ -306,6 +325,18 @@ void ToggleNight(){
 	ToggleSky();
 	ToggleWindow();
 }	
+
+void StopRunning(){
+	noRed = !noRed;
+	if(noRed){
+		rTLR = 211 ,gTLR = 211,bTLR = 211
+		,rTLG = 0 ,gTLG = 255 ,bTLG = 0;
+	}
+	if(!noRed){
+		rTLR = 255 ,gTLR = 0,bTLR = 0
+		,rTLG = 211 ,gTLG = 211 ,bTLG = 211;
+	}
+}
 
 void Draw(){
 	Background();
@@ -355,24 +386,33 @@ void Draw(){
     glPopMatrix();
 
     TrafficLight(8.0f, -4.0f);
-    Car(-9.0f, -5.7f);
-    Car(-5.0f, -8.7f);
+    
+    glPushMatrix();
+    glTranslatef(-5.0 + x,0,0);
+    Car(-12.0f, -5.7f);
+    Car(-8.0f, -8.7f);
     Car(0.0f, -8.7f);
-    Car(2.0f, -5.7f);
+    Car(5.0f, -5.7f);
+    	if(noRed)
+    	x+=0.05;
+    glPopMatrix();
+    
+    if(x>12)
+    x = 0.0;
+
 }
 
-void display( void )
-{
+void display( void ){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_LINE_STIPPLE);
 	
 	Draw();
 
+	glutPostRedisplay();
 	glutSwapBuffers();
 }
 
-void keyboard ( unsigned char key, int x, int y )
-{
+void keyboard ( unsigned char key, int x, int y ){
 	switch ( key )
 	{
 		case 27:
@@ -381,7 +421,11 @@ void keyboard ( unsigned char key, int x, int y )
 		case 'Q':
 		case 'q':
 			ToggleNight();
-			break;							
+			break;
+		case 'W':
+		case 'w':
+			StopRunning();
+			break;								
 		default:
 			return;
 	}
@@ -402,13 +446,11 @@ void mouse(int button, int state, int x, int y){
 	glutPostRedisplay();
 }
 
-int  main ( int argc, char** argv )
-{
+int  main ( int argc, char** argv ){
     glutInit ( &argc, argv );	//Usada apra iniciar o ambiente Glut
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
     glutCreateWindow ("Projeto Final"); 
-    glutInitWindowSize (1024, 1024);
-    glutInitWindowPosition (0, 0);
+    glutFullScreen();
     init();
     glutDisplayFunc (display);
     glutKeyboardFunc (keyboard);
