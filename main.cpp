@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
-#include <glut.h>
+#include <GL/glut.h>
 #include <math.h>
 #include <cmath>
 
@@ -138,7 +138,7 @@ void House() {
 	glVertex2f(5.8f, 0.0f);
 	glEnd();
 	
-	//Iluminação noturna
+	//Iluminacaoo noturna
 	if(DrawStars){
 		glColor4f(1.0,1.0,0,0.3);
 		glBegin(GL_POLYGON);
@@ -272,7 +272,7 @@ void Car(float x, float y){
     glColor3f(rWindow, gWindow, bWindow);
     Circle(x + 1.9f, y + 0.8f, 0.1f, 100);
     
-    //Iluminação Noturna
+    //Iluminacao Noturna
     if(DrawStars){
     	glColor4f(1.0,1.0,0.0,0.2);
     	glBegin(GL_TRIANGLES);
@@ -388,22 +388,18 @@ void Draw(){
     TrafficLight(8.0f, -4.0f);
     
     glPushMatrix();
-    glTranslatef(-5.0 + x,0,0);
+    glTranslatef(-2.0 + x,0,0);
     Car(-12.0f, -5.7f);
     Car(-8.0f, -8.7f);
     Car(0.0f, -8.7f);
     Car(5.0f, -5.7f);
     	if(noRed)
-    	x+=0.05;
+    	x+=0.02;
     glPopMatrix();
     
-    if(x>12)
+    if(x>10)
     x = 0.0;
 
-}
-
-void MenuTrafficLigth(int value){
-	
 }
 
 void Menu2(int value){
