@@ -18,7 +18,7 @@ também é possível alternar entre dia e noite.
 
 1. Clone o repositório:
      ```
-     https://github.com/ThigasSantos/CenaCompGraf.git
+     git clone https://github.com/ThigasSantos/CenaCompGraf.git
      
 2. Navegue até o diretório do projeto:
      ```
